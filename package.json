@@ -1,7 +1,10 @@
 {
     "name": "homebridge-philips-tv-2020",
+    "displayName": "Homebridge Philips TV",
     "version": "1.0.0",
     "description": "Homebridge plugin to control (some) 2020 Philips TVs. Made for 43PUS7805 2020 model. Should work for most non-Android TV version 6 API TVs.",
+    "license": "Apache-2.0",
+    "author": "Larsjuhw",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -22,8 +25,6 @@
         "node": ">=10.17.0",
         "homebridge": ">=1.0.0"
     },
-    "author": "Larsjuhw",
-    "license": "Apache-2.0",
     "bugs": {
         "url": "https://github.com/larsjuhw/homebridge-philips-tv-2020/issues"
     },
