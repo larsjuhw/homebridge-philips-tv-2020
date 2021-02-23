@@ -22,6 +22,14 @@ While you are in the remote menu, you can use the volume buttons of your device 
 
 ## Installation
 
+### Installing the plugin
+
+This plugin is not published on npm. To install it from GitHub, make sure you have git installed and run:
+
+```shell
+npm install -g git+https://github.com/larsjuhw/homebridge-philips-tv-2020.git
+```
+
 ### Adding the accessory to HomeKit
 
 HomeKit currently only allows one bridge to add one Television accessory. Therefore,this plugin is configured as a separate accessory and you need to manually add it to HomeKit.
