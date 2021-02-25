@@ -43,20 +43,23 @@ class PhilipsTelevisionPlugin {
         // Add handlers for on/off events
         tvService.getCharacteristic(this.Characteristic.Active)
             .on('set', (newValue, callback) => {
-                that.log.info('set Active => setNewValue: ' + newValue);
 
                 if (newValue == 1) {
+                    that.log.info("TV turned on");
+
                     // Turn on TV using WOL
                     var wol_wake = function () {
                         wol.wake(mac_address, function (error) {
                             if (error) {
-                                that.log("WOL failed: %s", error);
+                                that.log.error("WOL failed: %s", error);
                             }
                         })
                     }
-
+                    
                     wol_wake();
                 } else {
+                    that.log.info("TV turned off");
+
                     // Turn off TV using Standby key POST request
                     this.remoteButton("Standby");
                 }
@@ -77,7 +80,7 @@ class PhilipsTelevisionPlugin {
                         state = response.powerstate == "On" ? 1 : 0;
                     }
 
-                    that.log("Got powerstate: " + state);
+                    that.log.debug("Got powerstate: " + state);
 
                     callback(null, state);
                 });
@@ -93,8 +96,8 @@ class PhilipsTelevisionPlugin {
                 // so subtract 1 from the new value.
                 const i = newValue - 1;
 
-                this.log.info('set Active Identifier => setNewValue: ' + newValue);
-                this.log.info("set ambilight configuration to " + ambilightStyles[i].name);
+                this.log.debug('set Ambilight Active Identifier => setNewValue: ' + newValue);
+                this.log.debug("set ambilight configuration to " + ambilightStyles[i].name);
 
                 this.setAmbilight(ambilightStyles[i]);
 
@@ -106,67 +109,67 @@ class PhilipsTelevisionPlugin {
             .on('set', (newValue, callback) => {
                 switch (newValue) {
                     case this.Characteristic.RemoteKey.REWIND: {
-                        this.log.info('set Remote Key Pressed: REWIND');
+                        this.log.debug('set Remote Key Pressed: REWIND');
                         this.remoteButton("Rewind");
                         break;
                     }
                     case this.Characteristic.RemoteKey.FAST_FORWARD: {
-                        this.log.info('set Remote Key Pressed: FAST_FORWARD');
+                        this.log.debug('set Remote Key Pressed: FAST_FORWARD');
                         this.remoteButton("FastForward");
                         break;
                     }
                     case this.Characteristic.RemoteKey.NEXT_TRACK: {
-                        this.log.info('set Remote Key Pressed: NEXT_TRACK');
+                        this.log.debug('set Remote Key Pressed: NEXT_TRACK');
                         this.remoteButton("Next");
                         break;
                     }
                     case this.Characteristic.RemoteKey.PREVIOUS_TRACK: {
-                        this.log.info('set Remote Key Pressed: PREVIOUS_TRACK');
+                        this.log.debug('set Remote Key Pressed: PREVIOUS_TRACK');
                         this.remoteButton("Previous");
                         break;
                     }
                     case this.Characteristic.RemoteKey.ARROW_UP: {
-                        this.log.info('set Remote Key Pressed: ARROW_UP');
+                        this.log.debug('set Remote Key Pressed: ARROW_UP');
                         this.remoteButton("CursorUp");
                         break;
                     }
                     case this.Characteristic.RemoteKey.ARROW_DOWN: {
-                        this.log.info('set Remote Key Pressed: ARROW_DOWN');
+                        this.log.debug('set Remote Key Pressed: ARROW_DOWN');
                         this.remoteButton("CursorDown");
                         break;
                     }
                     case this.Characteristic.RemoteKey.ARROW_LEFT: {
-                        this.log.info('set Remote Key Pressed: ARROW_LEFT');
+                        this.log.debug('set Remote Key Pressed: ARROW_LEFT');
                         this.remoteButton("CursorLeft");
                         break;
                     }
                     case this.Characteristic.RemoteKey.ARROW_RIGHT: {
-                        this.log.info('set Remote Key Pressed: ARROW_RIGHT');
+                        this.log.debug('set Remote Key Pressed: ARROW_RIGHT');
                         this.remoteButton("CursorRight");
                         break;
                     }
                     case this.Characteristic.RemoteKey.SELECT: {
-                        this.log.info('set Remote Key Pressed: SELECT');
+                        this.log.debug('set Remote Key Pressed: SELECT');
                         this.remoteButton("Confirm");
                         break;
                     }
                     case this.Characteristic.RemoteKey.BACK: {
-                        this.log.info('set Remote Key Pressed: BACK');
+                        this.log.debug('set Remote Key Pressed: BACK');
                         this.remoteButton("Back");
                         break;
                     }
                     case this.Characteristic.RemoteKey.EXIT: {
-                        this.log.info('set Remote Key Pressed: EXIT');
+                        this.log.debug('set Remote Key Pressed: EXIT');
                         this.remoteButton("Back");
                         break;
                     }
                     case this.Characteristic.RemoteKey.PLAY_PAUSE: {
-                        this.log.info('set Remote Key Pressed: PLAY_PAUSE');
+                        this.log.debug('set Remote Key Pressed: PLAY_PAUSE');
                         this.remoteButton("AmbilightOnOff");
                         break;
                     }
                     case this.Characteristic.RemoteKey.INFORMATION: {
-                        this.log.info('set Remote Key Pressed: INFORMATION');
+                        this.log.debug  ('set Remote Key Pressed: INFORMATION');
                         this.remoteButton("Home");
                         break;
                     }
@@ -188,19 +191,19 @@ class PhilipsTelevisionPlugin {
         // Handle volume changes
         speakerService.getCharacteristic(this.Characteristic.VolumeSelector)
             .on('set', (newValue, callback) => {
-                this.log.info('set VolumeSelector => setNewValue: ' + newValue);
+                this.log.debug('set VolumeSelector => setNewValue: ' + newValue);
 
                 if (newValue == 0) {
                     // Volume up
-                    that.log("Sending VolumeUp key");
+                    that.log.debug("Sending VolumeUp key");
                     this.remoteButton("VolumeUp");
                 } else if (newValue == 1) {
                     // Volume down
-                    that.log("Sending VolumeDown key");
+                    that.log.debug("Sending VolumeDown key");
                     this.remoteButton("VolumeDown");
                 } else {
                     // Unknown?
-                    that.log("ERROR: UNKNOWN VOLUMESELECTOR VALUE (" + newValue + ")");
+                    that.log.error("ERROR: UNKNOWN VOLUMESELECTOR VALUE (" + newValue + ")");
                 }
 
                 callback(null);
@@ -208,7 +211,7 @@ class PhilipsTelevisionPlugin {
 
         speakerService.getCharacteristic(this.Characteristic.Mute)
             .on('set', (newValue, callback) => {
-                this.log("Speakers new value: " + newValue);
+                this.log.debug("Speakers new value: " + newValue);
                 var muted = newValue == 1;
                 var body = {
                     "muted": muted
@@ -283,8 +286,8 @@ class PhilipsTelevisionPlugin {
                     // Success
                     return body;
                 } else if (response) {
-                    code = response.statusCode || "?";
-                    that.log("Error (" + code + ") during POST request to " + url);
+                    const code = response.statusCode || "?";
+                    that.log.error("Error (" + code + ") during POST request to " + url);
                     return false;
                 }
             })
@@ -305,7 +308,7 @@ class PhilipsTelevisionPlugin {
                     // Success
                     callback(body);
                 } else {
-                    that.log("Error during GET request (code %s)", response)
+                    that.log.error("Error during GET request (code %s)", response)
                     callback(false);
                 }
             })
