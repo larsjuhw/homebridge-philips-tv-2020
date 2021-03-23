@@ -308,7 +308,7 @@ class PhilipsTelevisionPlugin {
                     // Success
                     callback(body);
                 } else {
-                    that.log.error("Error during GET request (code %s)", response)
+                    // that.log.error("Error during GET request (code %s)", response)
                     callback(false);
                 }
             })
