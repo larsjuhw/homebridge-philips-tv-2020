@@ -27,6 +27,11 @@
             "placeholder": "e.g. FF:FF:FF:FF:FF:FF",
             "required": true
         },
+        "ambihue": {
+            "title": "Ambilight + Hue as Play/Pause button",
+            "type": "boolean",
+            "default": true
+        },
         "ambilight_styles": {
             "title": "Ambilight Styles",
             "description": "Array of ambilight style objects to be displayed as sources in HomeKit, each of which contain a 'name', 'value', 'type', and optionally 'str'. See https://github.com/larsjuhw/homebridge-philips-tv-2020#ambilight-styles for an example and more information.",

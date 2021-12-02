@@ -42,9 +42,12 @@ HomeKit currently only allows one bridge to add one Television accessory. Theref
 
 #### Required parameters
 
-* name - The name of your TV in HomeKit
-* ip - The IP address of your TV
-* mac_address - The MAC Address of your TV. Used to turn on the TV with WOL.
+| Name        | Type    | Description                                                                                        |
+|-------------|---------|----------------------------------------------------------------------------------------------------|
+| name        | string  | The name of your TV in HomeKit                                                                     |
+| ip          | string  | The IP address of your TV                                                                          |
+| mac_address | string  | The MAC Address of your TV which is used to turn on the TV with WOL                                |
+| ambihue     | boolean | Whether the Play/Pause button should be replace by an Ambilight + Hue toggle                       |
 
 #### Optional parameters
 * ambilight_styles - List of Ambilight style objects. See [Ambilight styles](#ambilight-styles) for more information.
@@ -54,14 +57,15 @@ HomeKit currently only allows one bridge to add one Television accessory. Theref
 ```json
 {
     "platform": "HomebridgePhilipsTV",
-    "name": "...",
-    "ip": "...",
-    "mac_address": "...",
+    "name": "Philips TV",
+    "ip": "192.168.2.110",
+    "mac_address": "51:AC:47:4A:0A:8B",
+    "ambihue": false,
     "ambilight_styles": [
         {
-            "name": "...",
-            "value": "...",
-            "type": "..."
+            "name": "Standard",
+            "value": "STANDARD",
+            "type": "FOLLOW_VIDEO"
         }
     ]
 }

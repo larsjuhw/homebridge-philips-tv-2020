@@ -25,6 +25,7 @@ class PhilipsTelevisionPlugin {
         const mac_address = this.config.mac_address;
         const baseURL = "http://" + tvIP + ":1925/6/";
         const ambilightStyles = this.config.ambilight_styles || [];
+        const ambiHue = this.config.ambihue || false;
 
         this.log.info("Found " + ambilightStyles.length + " ambilight styles");
 
@@ -37,16 +38,14 @@ class PhilipsTelevisionPlugin {
 
         // Add TV service to platform
         const tvService = this.tvAccessory.addService(this.Service.Television);
+        var tvPower = this.Characteristic.Active.INACTIVE;
         tvService.setCharacteristic(this.Characteristic.ConfiguredName, tvName);
         tvService.setCharacteristic(this.Characteristic.SleepDiscoveryMode, this.Characteristic.SleepDiscoveryMode.NOT_DISCOVERABLE);
 
         // Add handlers for on/off events
         tvService.getCharacteristic(this.Characteristic.Active)
-            .on('set', (newValue, callback) => {
-
-                if (newValue == 1) {
-                    that.log.info("TV turned on");
-
+            .on('set', (value, callback) => {
+                if (value == this.Characteristic.Active.ACTIVE) {
                     // Turn on TV using WOL
                     var wol_wake = function () {
                         wol.wake(mac_address, function (error) {
@@ -55,16 +54,21 @@ class PhilipsTelevisionPlugin {
                             }
                         })
                     }
-                    
                     wol_wake();
+                    tvPower = this.Characteristic.Active.ACTIVE;
+                    that.log.info("TV turned on");
                 } else {
-                    that.log.info("TV turned off");
+                    tvService.updateCharacteristic(this.Characteristic.Active, this.Characteristic.Active.ACTIVE);
+                    // Temporarily disabled turning off the TV as the TV was
+                    // being turned off randomly throughout the day.
+                    setTimeout(() => {
+                        tvService.updateCharacteristic(Characteristic.Active, tvPower);
+                    }, 100);
 
-                    // Turn off TV using Standby key POST request
-                    this.remoteButton("Standby");
+                    // that.log.info("TV turned off");
+                    // // Turn off TV using Standby key POST request
+                    // this.remoteButton("Standby");
                 }
-
-                tvService.updateCharacteristic(this.Characteristic.Active, 1);
                 callback(null);
             })
             .on('get', (callback) => {
@@ -80,14 +84,14 @@ class PhilipsTelevisionPlugin {
                         state = response.powerstate == "On" ? 1 : 0;
                     }
 
+                    tvPower = state;
                     that.log.debug("Got powerstate: " + state);
-
                     callback(null, state);
                 });
             });
 
         // Set default source (ambilight style) identifier to 1
-        tvService.setCharacteristic(this.Characteristic.ActiveIdentifier, 1);
+        tvService.updateCharacteristic(this.Characteristic.ActiveIdentifier, 1);
 
         // Handle source (ambilight style) changes
         tvService.getCharacteristic(this.Characteristic.ActiveIdentifier)
@@ -107,6 +111,10 @@ class PhilipsTelevisionPlugin {
         // Handle TV remote inputs
         tvService.getCharacteristic(this.Characteristic.RemoteKey)
             .on('set', (newValue, callback) => {
+                if (!tvPower) {
+                    callback(null);
+                    return;
+                }
                 switch (newValue) {
                     case this.Characteristic.RemoteKey.REWIND: {
                         this.log.debug('set Remote Key Pressed: REWIND');
@@ -165,16 +173,19 @@ class PhilipsTelevisionPlugin {
                     }
                     case this.Characteristic.RemoteKey.PLAY_PAUSE: {
                         this.log.debug('set Remote Key Pressed: PLAY_PAUSE');
-                        this.remoteButton("AmbilightOnOff");
+                        if (ambiHue) {
+                            this.toggleAmbiHue();
+                        } else {
+                            this.remoteButton("AmbilightOnOff");
+                        }
                         break;
                     }
                     case this.Characteristic.RemoteKey.INFORMATION: {
-                        this.log.debug  ('set Remote Key Pressed: INFORMATION');
+                        this.log.debug('set Remote Key Pressed: INFORMATION');
                         this.remoteButton("Home");
                         break;
                     }
                 }
-
                 callback(null);
             });
 
@@ -193,11 +204,11 @@ class PhilipsTelevisionPlugin {
             .on('set', (newValue, callback) => {
                 this.log.debug('set VolumeSelector => setNewValue: ' + newValue);
 
-                if (newValue == 0) {
+                if (newValue == this.Characteristic.VolumeSelector.INCREMENT) {
                     // Volume up
                     that.log.debug("Sending VolumeUp key");
                     this.remoteButton("VolumeUp");
-                } else if (newValue == 1) {
+                } else if (newValue == this.Characteristic.VolumeSelector.DECREMENT) {
                     // Volume down
                     that.log.debug("Sending VolumeDown key");
                     this.remoteButton("VolumeDown");
@@ -205,8 +216,6 @@ class PhilipsTelevisionPlugin {
                     // Unknown?
                     that.log.error("ERROR: UNKNOWN VOLUMESELECTOR VALUE (" + newValue + ")");
                 }
-
-                callback(null);
             });
 
         speakerService.getCharacteristic(this.Characteristic.Mute)
@@ -268,6 +277,30 @@ class PhilipsTelevisionPlugin {
                 body['menuSetting'] = style.value;
             }
             this.post("ambilight/currentconfiguration", body);
+        }
+
+        this.setAmbiHue = function (state) {
+            const power = state ? "On" : "Off";
+            var body = {
+                "power": power
+            }
+            that.post("HueLamp/power", body);
+            that.log.info("Set ambihue to " + power);
+        }
+
+        this.getAmbiHue = function (callback) {
+            this.get("HueLamp/power", (result) => {
+                const response = JSON.parse(result);
+                const power = response.power == "On" ? 1 : 0;
+                callback(power)
+            });
+        }
+        
+        this.toggleAmbiHue = function () {
+            this.getAmbiHue((state) => {
+                const newState = !state;
+                setTimeout(() => {that.setAmbiHue(newState)}, 20);
+            });
         }
 
         this.post = function (endpoint, body) {
