@@ -61,9 +61,10 @@ class PhilipsTelevisionPlugin {
                     tvService.updateCharacteristic(this.Characteristic.Active, this.Characteristic.Active.ACTIVE);
                     // Temporarily disabled turning off the TV as the TV was
                     // being turned off randomly throughout the day.
+                    that.log.info("Tried turning off TV");
                     setTimeout(() => {
-                        tvService.updateCharacteristic(Characteristic.Active, tvPower);
-                    }, 100);
+                        tvService.updateCharacteristic(this.Characteristic.Active, tvPower);
+                    }, 10);
 
                     // that.log.info("TV turned off");
                     // // Turn off TV using Standby key POST request
