@@ -217,6 +217,7 @@ class PhilipsTelevisionPlugin {
                     // Unknown?
                     that.log.error("ERROR: UNKNOWN VOLUMESELECTOR VALUE (" + newValue + ")");
                 }
+                callback(null);
             });
 
         speakerService.getCharacteristic(this.Characteristic.Mute)
