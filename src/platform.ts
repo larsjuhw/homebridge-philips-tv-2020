@@ -22,50 +22,20 @@ export class PhilipsTelevisionPlatform implements DynamicPlatformPlugin {
     ) {
         this.log.debug('Finished initializing platform:', this.config.name);
 
-        // When this event is fired it means Homebridge has restored all cached accessories from disk.
-        // Dynamic Platform plugins should only register new accessories after this event was fired,
-        // in order to ensure they weren't added to homebridge already. This event can also be used
-        // to start discovery of new accessories.
         this.api.on('didFinishLaunching', () => {
             log.debug('Executed didFinishLaunching callback');
-            // run the method to discover / register your devices as accessories
             this.discoverDevices();
         });
     }
 
-    /**
-     * This function is invoked when homebridge restores cached accessories from disk at startup.
-     * It should be used to setup event handlers for characteristics and update respective values.
-     */
     configureAccessory(accessory: PlatformAccessory) {
         this.log.info('Loading accessory from cache:', accessory.displayName);
-
-        // add the restored accessory to the accessories cache so we can track if it has already been registered
         this.accessories.push(accessory);
     }
 
-    /**
-     * This is an example method showing how to register discovered accessories.
-     * Accessories must only be registered once, previously created accessories
-     * must not be registered again to prevent "duplicate UUID" errors.
-     */
     discoverDevices() {
-
-        // EXAMPLE ONLY
-        // A real plugin you would discover accessories from the local network, cloud services
-        // or a user-defined array in the platform config.
-        const exampleDevices = [
-            {
-                name: 'TV',
-                model: '43PUS7805',
-                serial: 'Unknown',
-                ip: '192.168.2.3',
-                mac: '68:07:0A:18:87:EB',
-            },
-        ];
-
         // loop over the discovered devices and register each one if it has not already been registered
-        for (const device of exampleDevices) {
+        for (const device of this.config.devices) {
 
             const uuid = this.api.hap.uuid.generate(device.mac);
             const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
@@ -78,6 +48,7 @@ export class PhilipsTelevisionPlatform implements DynamicPlatformPlugin {
                 this.log.info('Adding new accessory:', device.name);
 
                 const accessory = new this.api.platformAccessory(device.name, uuid);
+                accessory.category = this.api.hap.Categories.TELEVISION;
                 accessory.context.device = device;
 
                 new PhilipsTVPlatformAccessory(this, accessory);
