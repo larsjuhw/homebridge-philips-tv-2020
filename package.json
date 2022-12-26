@@ -13,8 +13,8 @@
         "prepublishOnly": "npm run lint && npm run build"
     },
     "dependencies": {
+        "philips-tv-api": "https://github.com/larsjuhw/philipsandroidtv/tarball/d59b4d243a0ce775901b735a00e0a527447c2251",
         "request": "^2.69.0",
-        "philips-tv-api": "https://github.com/larsjuhw/philipsandroidtv/tarball/071b159801f5073061c072c31e2d219a5cefd389",
         "wake_on_lan": "latest"
     },
     "devDependencies": {

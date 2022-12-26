@@ -5,83 +5,121 @@
     "headerDisplay": "Televisions are exposed to HomeKit as separate accessories and need to be manually paired.\n\n1. Open the Home <img src='https://user-images.githubusercontent.com/3979615/78010622-4ea1d380-738e-11ea-8a17-e6a465eeec35.png' height='16.42px'> app on your device.\n2. Tap the Home tab, then tap <img src='https://user-images.githubusercontent.com/3979615/78010869-9aed1380-738e-11ea-9644-9f46b3633026.png' height='16.42px'>.\n3. Tap *Add Accessory*, and select *I Don't Have a Code or Cannot Scan*.\n4. Enter the Homebridge PIN, this can be found under the QR code in Homebridge UI or your Homebridge logs.",
     "footerDisplay": "See https://github.com/larsjuhw/homebridge-philips-tv-2020 for more information.",
     "schema": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "title": "Name",
-          "type": "string",
-          "default": "Philips TV",
-          "required": true
-        },
-        "ip": {
-            "title": "TV IP Address",
-            "type": "string",
-            "placeholder": "e.g. 10.0.0.10",
-            "format": "ipv4",
-            "required": true
-        },
-        "mac_address": {
-            "title": "MAC Address",
-            "type": "string",
-            "pattern": "^([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}$",
-            "placeholder": "e.g. FF:FF:FF:FF:FF:FF",
-            "required": true
-        },
-        "ambihue": {
-            "title": "Ambilight + Hue as Play/Pause button",
-            "type": "boolean",
-            "default": true
-        },
-        "ambilight_styles": {
-            "title": "Ambilight Styles",
-            "description": "Array of ambilight style objects to be displayed as sources in HomeKit, each of which contain a 'name', 'value', 'type', and optionally 'str'. See https://github.com/larsjuhw/homebridge-philips-tv-2020#ambilight-styles for an example and more information.",
+        "devices": {
+            "title": "TVs",
             "type": "array",
-            "required": false,
             "items": {
-                "title": "Style",
+                "title": "TV",
                 "type": "object",
                 "properties": {
                     "name": {
                         "title": "Name",
                         "type": "string",
-                        "description": "Name of style to be displayed in HomeKit.",
+                        "default": "Philips TV",
                         "required": true
                     },
-                    "value": {
-                        "title": "menuSetting",
+                    "model": {
+                        "title": "Model",
                         "type": "string",
-                        "description": "The menuSetting value of the style as returned by the ambilight/currentconfiguration API endpoint.",
+                        "placeholder": "43PUS7805",
+                        "required": false
+                    },
+                    "serial": {
+                        "title": "Model",
+                        "type": "string",
+                        "placeholder": "4c8a7fdc-02b9-58fe-8dba5d63",
+                        "required": false
+                    },
+                    "ip": {
+                        "title": "IP Address",
+                        "type": "string",
+                        "placeholder": "e.g. 10.0.0.10",
+                        "format": "ipv4",
                         "required": true
                     },
-                    "type": {
-                        "title": "styleName",
+                    "mac": {
+                        "title": "MAC Address",
                         "type": "string",
-                        "description": "The style type that ambilight/currentconfiguration has as styleName.",
+                        "pattern": "^([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}$",
+                        "placeholder": "e.g. FF:FF:FF:FF:FF:FF",
+                        "required": true
+                    },
+                    "ambihueName": {
+                        "title": "Ambilight + Hue Lightbulb Name",
+                        "type": "string",
                         "required": true,
-                        "oneOf": [
-                            {
-                                "title": "FOLLOW_VIDEO",
-                                "enum": ["FOLLOW_VIDEO"]
-                            },
-                            {
-                                "title": "FOLLOW_AUDIO",
-                                "enum": ["FOLLOW_AUDIO"]
-                            },
-                            {
-                                "title": "FOLLOW_COLOR",
-                                "enum": ["FOLLOW_COLOR"]
-                            }
-                        ]
+                        "description": "The name of the Ambilight + Hue toggle lightbulb"
                     },
-                    "str": {
-                        "title": "stringValue",
+                    "refreshInterval": {
+                        "title": "Refresh Interval (ms)",
+                        "type": "integer",
+                        "required": true,
+                        "minimum": 1000
+                    },
+                    "enablePlaypauseRebind": {
+                        "title": "Rebind play/pause remote button",
+                        "type": "boolean"
+                    },
+                    "playpauseRebind": {
+                        "title": "Play/Pause button rebind",
                         "type": "string",
-                        "description": "Using menuSetting is not working for some styles. Use the stringValue of the style as the alternative. menuSetting is still required, but will be ignored.",
+                        "condition": {
+                            "functionBody": "return model.devices[arrayIndices].enablePlaypauseRebind === true"
+                        },
+                        "description": "Key to replace the Play/Pause button on the remote with",
+                        "oneOf": [
+                            { "title": "Standby", "enum": ["Standby"] },
+                            { "title": "Back", "enum": ["Back"] },
+                            { "title": "Find", "enum": ["Find"] },
+                            { "title": "RedColour", "enum": ["RedColour"] },
+                            { "title": "GreenColour", "enum": ["GreenColour"] },
+                            { "title": "YellowColour", "enum": ["YellowColour"] },
+                            { "title": "BlueColour", "enum": ["BlueColour"] },
+                            { "title": "Home", "enum": ["Home"] },
+                            { "title": "VolumeUp", "enum": ["VolumeUp"] },
+                            { "title": "VolumeDown", "enum": ["VolumeDown"] },
+                            { "title": "Mute", "enum": ["Mute"] },
+                            { "title": "Options", "enum": ["Options"] },
+                            { "title": "Dot", "enum": ["Dot"] },
+                            { "title": "Digit0", "enum": ["Digit0"] },
+                            { "title": "Digit1", "enum": ["Digit1"] },
+                            { "title": "Digit2", "enum": ["Digit2"] },
+                            { "title": "Digit3", "enum": ["Digit3"] },
+                            { "title": "Digit4", "enum": ["Digit4"] },
+                            { "title": "Digit5", "enum": ["Digit5"] },
+                            { "title": "Digit6", "enum": ["Digit6"] },
+                            { "title": "Digit7", "enum": ["Digit7"] },
+                            { "title": "Digit8", "enum": ["Digit8"] },
+                            { "title": "Digit9", "enum": ["Digit9"] },
+                            { "title": "Info", "enum": ["Info"] },
+                            { "title": "CursorUp", "enum": ["CursorUp"] },
+                            { "title": "CursorDown", "enum": ["CursorDown"] },
+                            { "title": "CursorLeft", "enum": ["CursorLeft"] },
+                            { "title": "CursorRight", "enum": ["CursorRight"] },
+                            { "title": "Confirm", "enum": ["Confirm"] },
+                            { "title": "Next", "enum": ["Next"] },
+                            { "title": "Previous", "enum": ["Previous"] },
+                            { "title": "Adjust", "enum": ["Adjust"] },
+                            { "title": "WatchTV", "enum": ["WatchTV"] },
+                            { "title": "Viewmode", "enum": ["Viewmode"] },
+                            { "title": "Teletext", "enum": ["Teletext"] },
+                            { "title": "Subtitle", "enum": ["Subtitle"] },
+                            { "title": "ChannelStepUp", "enum": ["ChannelStepUp"] },
+                            { "title": "ChannelStepDown", "enum": ["ChannelStepDown"] },
+                            { "title": "Source", "enum": ["Source"] },
+                            { "title": "AmbilightOnOff", "enum": ["AmbilightOnOff"] },
+                            { "title": "Play", "enum": ["Play"] },
+                            { "title": "Pause", "enum": ["Pause"] },
+                            { "title": "FastForward", "enum": ["FastForward"] },
+                            { "title": "Stop", "enum": ["Stop"] },
+                            { "title": "Rewind", "enum": ["Rewind"] },
+                            { "title": "Record", "enum": ["Record"] },
+                            { "title": "Online", "enum": ["Online"] }
+                        ],
                         "required": false
                     }
                 }
             }
         }
-      }
     }
-  }
+}

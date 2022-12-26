@@ -1,15 +1,26 @@
 # Homebridge-philips-tv-2020
 
-A Homebridge plugin to control your Philips TV. Made for the 43PUS7805 2020 model, but it should work for most non-Android TV version 6 API TVs.
+A Homebridge plugin to control your Philips TV. Made for the 43PUS7805 2020 model, but it should work for some other Jointspace, non-Android TV, version 6 API TVs.
 
 Uses API version 6 and port 1925.
+
+To check if your TV is compatible:
+
+1. Turn the TV off completely
+2. Unplug the tv and plug in again
+3. Turn the TV on
+4. Try visiting <http://[[YOUR-TV-IP-ADDRESS]]:1925/6/powerstate>
+
+If you see a JSON response about the powerstate of the TV, it is likely compatible. 
+
+The reason that the TV has to be unplugged is that for some reason there is a maximum amount of sockets that the TV allows, and it seems like old sockets are not deleted from its memory. This plugin keeps the socket alive so there should be no problems.
 
 ## Features
 
 * Turn your TV on and off using HomeKit
 * Basic TV remote controls on your device
 * Change volume of TV on your device
-* Change ambilight style using a source selector in Home
+* Toggle Ambilight + Hue from HomeKit
 
 ![styles-preview](https://user-images.githubusercontent.com/39745476/105191104-00d1a400-5b37-11eb-9975-24625c92f669.png)
 ![controls-preview](https://user-images.githubusercontent.com/39745476/105191429-5908a600-5b37-11eb-8eb9-9b8ce4079aff.png)
@@ -46,7 +57,7 @@ HomeKit currently only allows one bridge to add one Television accessory. Theref
 |-------------|---------|----------------------------------------------------------------------------------------------------|
 | name        | string  | The name of your TV in HomeKit                                                                     |
 | ip          | string  | The IP address of your TV                                                                          |
-| mac_address | string  | The MAC Address of your TV which is used to turn on the TV with WOL                                |
+| mac_address | string  | The MAC Address of your TV which is used to turn on the TV with WoL                                |
 | ambihue     | boolean | Whether the Play/Pause button should be replace by an Ambilight + Hue toggle                       |
 
 #### Optional parameters
