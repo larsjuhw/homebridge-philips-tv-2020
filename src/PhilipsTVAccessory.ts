@@ -167,12 +167,13 @@ export class PhilipsTVPlatformAccessory {
         } else {
             if (this.power) {
                 this.platform.log.info(`[${this.name}] Turning off TV: powerstate =`, value as boolean);
-                try {
-                    await this.tv.setPowerState(value as boolean);
-                    this.power = value as boolean;
-                } catch (err) {
-                    this.platform.log.error(`[${this.name}] Error during setPowerState:`, err);
-                }
+                this.platform.log.warn(`[${this.name}] This function is currently disabled.`);
+                // try {
+                //     await this.tv.setPowerState(value as boolean);
+                //     this.power = value as boolean;
+                // } catch (err) {
+                //     this.platform.log.error(`[${this.name}] Error during setPowerState:`, err);
+                // }
 
             }
         }
